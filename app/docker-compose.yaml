@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+    celery:
+        build:
+            context: .
+        entrypoint: celery
+        command: -A tasks.exemplo worker --loglevel=info && -A tasks.exemplo beat -l info --pidfile= -f celery.log
+        volumes:
+            - .:/code
+        links:
+            - rabbitmq
+        depends_on:
+            - rabbitmq
+
+    rabbitmq:
+        image: rabbitmq:3-management
+        container_name: rabbitmq
+        ports:
+            - 5672:5672
+            - 15672:15672
+        expose:
+            - 5672
+            - 15672
+        restart: always
+        environment:
+          - RABBITMQ_DEFAULT_USER=admin
+          - RABBITMQ_DEFAULT_PASS=admin
